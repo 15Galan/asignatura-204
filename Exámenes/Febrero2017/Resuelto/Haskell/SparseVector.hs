@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
--- Student's name:
--- Student's group:
+-- Student's name:    Antonio J. Galán Herrera
+-- Student's group:   A
 --
 -- Data Structures. Grado en Informática. UMA.
 -------------------------------------------------------------------------------
@@ -34,27 +34,58 @@ data Vector a = V Int (Tree a) deriving Show
 -------------------------------------------------------------------------------
 -- | Exercise a.
 
-vector = undefined
+vector :: Int -> a -> Vector a
+vector n x | n < 0    = error "«n» no puede ser negativo"
+           | otherwise = (V (2^n) (Unif x))
 
 -------------------------------------------------------------------------------
 -- | Exercise b.
 
-size = undefined
+size :: Vector a -> Int
+size (V s t) = s
 
 -------------------------------------------------------------------------------
 -- | Exercise c.
 
-simplify = undefined
+simplify :: Eq a => Tree a -> Tree a -> Tree a
+simplify (Unif x) (Unif y) = if x == y then (Unif x) else Node (Unif x) (Unif y)
+simplify t1 t2 = Node t1 t2
 
 -------------------------------------------------------------------------------
 -- | Exercise d.
+{-
+get :: Int -> Vector a -> a
+get i (V s t) | i > s         = error "Índice fuera del tamaño del vector"
+              | otherwise     = aux i s t
+    where
+        aux i s (Unif x)     = x
+        aux i s (Node lt rt) | i `elem` (...) = aux i s' rt
+                             | i <  s'        = aux i s' lt
+            where
+                s'  = div s 2
+                si = [s..s']
+                sd = [s..(s' + (div s' 2)]
+-}
 
-get = undefined
+get :: Int -> Vector a -> a
+get i (V s t) | i > s     = error "Índice fuera del tamaño del vector"
+              | otherwise = aux s (div s 2) t
+    where
+        aux s a (Unif x)     = x
+        aux s a (Node lt rt) | i <  a = aux a sI lt
+                             | i >= a = aux a sD rt
+            where 
+                sI = a - (div a 2)
+                sD = a + (div a 2)
+
 
 -------------------------------------------------------------------------------
 -- | Exercise e.
 
-set = undefined
+set :: Int -> a -> Vector a -> Vector a
+set i x (V s t) | i > s         = error "Índice fuera del tamaño del vector"
+                | otherwise     = undefined
+
 
 -------------------------------------------------------------------------------
 -- | Exercise f.
@@ -63,15 +94,15 @@ set = undefined
 --
 --    operation        complexity class
 --    ---------------------------------
---    vector
+--    vector                 O(1)
 --    ---------------------------------
---    size
+--    size                   O(1)
 --    ---------------------------------
---    simplify
+--    simplify               O(1)
 --    ---------------------------------
---    get
+--    get                 "O(log n)"
 --    ---------------------------------
---    set
+--    set                 "O(log n)"
 --    ---------------------------------
 
 -------------------------------------------------------------------------------
