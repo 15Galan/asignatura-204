@@ -18,7 +18,7 @@ module SparseVector( Vector
 
 import Test.QuickCheck hiding (vector)
 
-data Tree a = Unif a | Node (Tree a) (Tree a) deriving Show
+data Tree a   = Unif a | Node (Tree a) (Tree a) deriving Show
 
 data Vector a = V Int (Tree a) deriving Show
 
@@ -55,19 +55,6 @@ simplify t1 t2 = Node t1 t2
 -- | Exercise d.
 {-
 get :: Int -> Vector a -> a
-get i (V s t) | i > s         = error "Índice fuera del tamaño del vector"
-              | otherwise     = aux i s t
-    where
-        aux i s (Unif x)     = x
-        aux i s (Node lt rt) | i `elem` (...) = aux i s' rt
-                             | i <  s'        = aux i s' lt
-            where
-                s'  = div s 2
-                si = [s..s']
-                sd = [s..(s' + (div s' 2)]
--}
-
-get :: Int -> Vector a -> a
 get i (V s t) | i > s     = error "Índice fuera del tamaño del vector"
               | otherwise = aux s (div s 2) t
     where
@@ -77,14 +64,30 @@ get i (V s t) | i > s     = error "Índice fuera del tamaño del vector"
             where 
                 sI = a - (div a 2)
                 sD = a + (div a 2)
-
+-}
+get :: Int -> Vector a -> a
+get n (V s t) | n < 0 || n >= s = error "fuera de rango"
+              | otherwise       = aux n s t
+    where
+        aux n sz (Unif x) = x
+        aux n sz (Node i d) | n < szm   = aux n szm i
+                            | otherwise = aux (n - szm) szm d
+            where
+                szm = sz `div` 2
 
 -------------------------------------------------------------------------------
 -- | Exercise e.
 
 set :: Int -> a -> Vector a -> Vector a
-set i x (V s t) | i > s         = error "Índice fuera del tamaño del vector"
-                | otherwise     = undefined
+set i x (V s t) | i >= s || i < 0 = error "Índice fuera del tamaño del vector"
+                | otherwise       = aux i x s t
+    where
+        aux :: Int -> a -> Int -> Vector a -> Vector a
+        aux i y s (Unif x) = (Unif y)
+        aux i y s (Node lt rt) | i < szm = aux i y lt
+                               | i > szm = aux i y rt
+            where
+                szm = div s 2
 
 
 -------------------------------------------------------------------------------
@@ -107,9 +110,11 @@ set i x (V s t) | i > s         = error "Índice fuera del tamaño del vector"
 
 -------------------------------------------------------------------------------
 -- | Exercise g.
-
-mapVector = undefined
-
+{-
+mapVector :: (a -> b) -> Vector a -> Vector a
+mapVector f (Unif x) = (Unif (f x))
+mapVector f (Node lt rt) = mapVector f lt
+-}
 -------------------------------------------------------------------------------
 -- | Exercise h.
 
