@@ -82,8 +82,7 @@ set :: Int -> a -> Vector a -> Vector a
 set i x (V s t) | i >= s || i < 0 = error "Índice fuera del tamaño del vector"
                 | otherwise       = aux i x s t
     where
-        aux :: Int -> a -> Int -> Vector a -> Vector a
-        aux i y s (Unif x) = (Unif y)
+        aux i y s (Unif x) = (V s (Unif y))
         aux i y s (Node lt rt) | i < szm = aux i y lt
                                | i > szm = aux i y rt
             where
