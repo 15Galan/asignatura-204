@@ -53,39 +53,37 @@ simplify t1 t2 = Node t1 t2
 
 -------------------------------------------------------------------------------
 -- | Exercise d.
-{-
+
 get :: Int -> Vector a -> a
-get i (V s t) | i > s     = error "Índice fuera del tamaño del vector"
-              | otherwise = aux s (div s 2) t
+get i (V s t) | i < 0 || i >= s = error "fuera de rango"
+              | otherwise       = aux i s t
     where
-        aux s a (Unif x)     = x
-        aux s a (Node lt rt) | i <  a = aux a sI lt
-                             | i >= a = aux a sD rt
-            where 
-                sI = a - (div a 2)
-                sD = a + (div a 2)
--}
-get :: Int -> Vector a -> a
-get n (V s t) | n < 0 || n >= s = error "fuera de rango"
-              | otherwise       = aux n s t
-    where
-        aux n sz (Unif x) = x
-        aux n sz (Node i d) | n < szm   = aux n szm i
-                            | otherwise = aux (n - szm) szm d
+        aux i sz (Unif x) = x
+        aux i sz (Node izq der) | i < szm   = aux i szm izq
+                                | otherwise = aux (i - szm) szm der
             where
                 szm = sz `div` 2
 
 -------------------------------------------------------------------------------
 -- | Exercise e.
 
-set :: Int -> a -> Vector a -> Vector a
+set :: Eq a => Int -> a -> Vector a -> Vector a
 set i x (V s t) | i >= s || i < 0 = error "Índice fuera del tamaño del vector"
-                | otherwise       = aux i x s t
+                | otherwise       = (V s (aux i x s t))
     where
-        aux i y s (Unif x) = (V s (Unif y))
-        aux i y s (Node lt rt) | i < szm = aux i y lt
-                               | i > szm = aux i y rt
+        aux :: Eq a => Int -> a -> Int -> Tree a -> Tree a
+        aux i y 0 (Unif x) = if i < (div s 2) -- Final de un árbol de altura «n».
+                                then Node (Unif y) (Unif x)
+                                else Node (Unif x) (Unif y)
+
+        aux i y s (Unif x) = if x == y -- Llegada a una hoja.
+                                then (Unif x)
+                                else aux i y (div s 2) (Node (Unif x) (Unif x)) 
+        
+        aux i y s (Node lt rt) | i < szm   = Node (aux i y szm lt) rt -- Llegada a un nodo.
+                               | otherwise = Node lt (aux i' y szm rt)
             where
+                i'  = i - szm
                 szm = div s 2
 
 
@@ -114,6 +112,9 @@ mapVector :: (a -> b) -> Vector a -> Vector a
 mapVector f (Unif x) = (Unif (f x))
 mapVector f (Node lt rt) = mapVector f lt
 -}
+
+mapVector = undefined
+
 -------------------------------------------------------------------------------
 -- | Exercise h.
 
