@@ -17,7 +17,6 @@ module DataStructures.Set.DisjointSet
                   , union
                   , flatten
                   , kinds
-                  , test
                   ) where
 
 import           Data.List                               (intercalate)
