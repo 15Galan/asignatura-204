@@ -136,7 +136,10 @@ public class DisjointSetDictionary<T extends Comparable<? super T>> implements D
     public void union(T elem1, T elem2) {
         T mayor, menor;
 
-        if (dic.isDefinedAt(elem1) && dic.isDefinedAt(elem2)) {
+        boolean pertenece1 = dic.isDefinedAt(elem1),
+                pertenece2 = dic.isDefinedAt(elem2);
+
+        if (pertenece1 && pertenece2) {
             if (elem1.compareTo(elem2) >= 0) {
                 mayor = root(elem1);
                 menor = root(elem2);
@@ -149,7 +152,16 @@ public class DisjointSetDictionary<T extends Comparable<? super T>> implements D
             dic.insert(mayor, menor);
 
         } else {
-            throw new IllegalArgumentException("Pene");
+            String elemento;
+
+            if (!pertenece1) {
+                elemento = elem1.toString();
+
+            } else {
+                elemento = elem2.toString();
+            }
+
+            throw new IllegalArgumentException(elemento + " no perteneciente");
         }
     }
 
