@@ -54,6 +54,7 @@ addObject p (B c l) | (c-p) >= 0 = B (c-p) (p:l)
 -- Dado un arbol AVL, definimos su capacidad restante maxima como:
 -- La capacidad restante del cubo del arbol con mayor capacidad restante
 maxRemainingCapacity :: AVL -> Capacity
+maxRemainingCapacity Empty = 0
 maxRemainingCapacity (Node b h c Empty Empty) = c
 maxRemainingCapacity (Node b h c izq der) = maximum [c, maxRemainingCapacity izq, maxRemainingCapacity der]
 
@@ -87,24 +88,32 @@ rotateLeft b izq der = Node bd hd cd (Node b h' (remainingCapacity b) izq izqd) 
 
 
 addNewBin :: Bin -> AVL -> AVL
-addNewBin b (Node _ _ _ Empty Empty) = Node b 1 (remainingCapacity b) Empty Empty
-addNewBin b (Node b h c Empty der) = addNewBin b der
+addNewBin bin (Node b h c Empty Empty) = Node b h c Empty der'
+  where
+    der' = Node bin 1 (remainingCapacity bin) Empty Empty
+addNewBin bin (Node b h c Empty der) = addNewBin b der
 -- Falta actualizar la altura
 
 
 addFirst :: Capacity -> Weight -> AVL -> AVL
-addFirst c p Empty = Node (addObject p $ emptyBin c) 1 c Empty Empty
-addFirst c p (Node b h cc izq der) | cabe      = addFirst c p izq
-                                   | not cabe  = addFirst c p der
+addFirst c p Empty = Node b' 1 (remainingCapacity b') Empty Empty   -- Arbol vacio
   where
-    cabe = p <= cc
+    b' = addObject p $ emptyBin c
+
+addFirst c p (Node b h cc izq der) | maxRemainingCapacity izq >= p = Node b h cc (addFirst c p izq) der
+                                   | remainingCapacity b >= p      = Node (addObject p b) h cc izq der
+                                   | otherwise = Node b h cc izq (addFirst c p der)
 
 
 addAll:: Capacity -> [Weight] -> AVL
-addAll _ _ = undefined
+addAll c [] = Node (emptyBin c) 1 c Empty Empty
+addAll c [p] = addFirst c p Empty
+addAll c (p:ps) = addFirst c p (addAll c ps)
 
 toList :: AVL -> [Bin]
-toList _ = undefined
+toList Empty = []   -- Arbol vacio
+toList (Node b h c Empty Empty) = [b]
+toList (Node b h c izq der) = toList izq ++ toList der
 
 {-
 	SOLO PARA ALUMNOS SIN EVALUACION CONTINUA
